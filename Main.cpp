@@ -418,4 +418,5 @@ int main(int argc, char *argv[])
     string fpath = "";
     findpathinMaze(18,18,curr_poss,fpath,"");
     fastpath(fpath);
+    
 }

@@ -37,7 +37,9 @@ using namespace std;
 
 pair<int, int> curr_poss;
 int dir = 0;
+int count = 0;
 bool stop = false;
+bool Isfounded = false;
 bool visit[60][60];
 bool visit_stack[60][60];
 const int X = 200;
@@ -66,17 +68,18 @@ int Vertical[4] = {1, 0, -1, 0};
 
 void print_arr()
 {
-    for (int i = 32; i >= 0; i--)
+    for (int i = 0; i <= 37; i++)
     {
-        for (int j = 0; j <= 34; j++)
+        for (int j = 0; j <= 37; j++)
         {
-            cerr << maze[j][i] << " ";
+            cerr << maze[i][j] << ",";
         }
-        cerr << endl;
+        cerr << "},{";
     }
 
     
 }
+
 void print_in()
 {
     for (int i = 0; i < 35; i++)
@@ -86,6 +89,7 @@ void print_in()
 cerr << endl;
     
 }
+
 void print_stk()
 {
     for (int i = 0; i < s.size(); i++)
@@ -102,6 +106,16 @@ void chackAt(int i,int j,int a, int b){
         cerr << a << " " << b << endl;
     }
 }
+
+void chackAt(int i,int j,string str){
+    if (curr_poss.first == i & curr_poss.second == j)
+    {
+        // print_arr();
+        // print_stk();
+        cerr << str << endl;
+    }
+}
+
 void log(const string &text)
 {
     cerr << text << endl;
@@ -119,9 +133,9 @@ void solveMaze(pair<int,int> poss,string& minans, string move )
 {
 	if (poss == s[stack_top])
 	{
-        if(minans == "" | minans.size() > move.size())
-            minans = move;
-		return;
+        minans = move;
+        Isfounded = true;
+        return;
 	}
 	string path = "0123";
 	for (int ind = 0; ind < 4; ind++)
@@ -129,10 +143,37 @@ void solveMaze(pair<int,int> poss,string& minans, string move )
 			// cout << nexti << " " << nextj << endl;
 		int nexti = poss.first + Horizontal[ind];
 		int nextj = poss.second + Vertical[ind];
-		if ( !visit[nexti][nextj] && maze[nexti][nextj] == 1)
+		if ( !visit[nexti][nextj] && maze[nexti][nextj] == 1 && !Isfounded)
 		{
 			visit[poss.first][poss.second] = 1;
 			solveMaze( {nexti,nextj} ,minans, move + path[ind]);
+			visit[poss.first][poss.second] = 0;
+		}
+	}
+}
+
+void findpathinMaze(int a,int b,pair<int,int> poss,string& minans, string move )
+{
+	if (poss.first == a & poss.second == b )
+	{
+        if (minans == "" | move <= minans)
+        { 
+            minans = move;
+            Isfounded = true;
+            return;
+        }
+        
+	}
+	string path = "0123";
+	for (int ind = 0; ind < 4; ind++)
+	{
+			// cout << nexti << " " << nextj << endl;
+		int nexti = poss.first + Horizontal[ind];
+		int nextj = poss.second + Vertical[ind];
+		if ( !visit[nexti][nextj] && maze[nexti][nextj] == 1 && !Isfounded)
+		{
+			visit[poss.first][poss.second] = 1;
+			findpathinMaze(a,b, {nexti,nextj} ,minans, move + path[ind]);
 			visit[poss.first][poss.second] = 0;
 		}
 	}
@@ -162,6 +203,31 @@ void followPath(string path){
     }
 }
 
+void fastpath(string path){
+    for (int i = 0; i < path.size(); i += 2)
+    { 
+        int path_dir = (int)path[i] - 48;
+        if(setdir(dir - 1) == path_dir)
+        {
+            API::turnLeft();
+        }
+        else if(setdir(dir + 1) == path_dir)
+        {
+            API::turnRight();
+        }
+        else if(setdir(dir + 2) == path_dir)
+        {
+            API::turnRight();
+            API::turnRight();
+        }
+        dir = setdir(path_dir);
+        API::moveForward();
+        curr_poss = {curr_poss.first + Horizontal[dir] * 2,curr_poss.second + Vertical[dir] * 2};
+        API::setColor(curr_poss.first/2 - 1, curr_poss.second/2 -1, 'r');
+
+    }
+}
+
 string getpath(){
     string path = "";
     solveMaze(curr_poss,path,"");
@@ -171,6 +237,9 @@ string getpath(){
 void backTrack(){
     vector<int> remove_ele;
     string finalpath = "";
+    Isfounded = false;
+
+
     for (stack_top = s.size() - 1; stack_top >= 0; stack_top--)
     {
         if(visit_stack[s[stack_top].first][s[stack_top].second]){ 
@@ -187,12 +256,14 @@ void backTrack(){
     {
         s.erase(s.begin() + remove_ele[i]);
     }
+    if(s.size() == 0 & finalpath.size() == 0){
+        stop = true;  
+        return;
+    }
+    
     
     followPath(finalpath); 
-    
-    
 }
-
 
 void findpath()
 {
@@ -333,9 +404,18 @@ int main(int argc, char *argv[])
     {
         findpath();
     }
-    // backTrack();
-    // log("comp...");
-    // // print_in();
-    // print_arr();
-
+    print_arr();
+    visit_stack[2][2] = 0;
+    s.push_back({2,2});
+    backTrack();
+    while (dir != 0)
+    {
+        API::turnRight();
+        dir = setdir(dir+1);
+    }
+    cerr << dir << endl;
+    Isfounded = false;
+    string fpath = "";
+    findpathinMaze(18,18,curr_poss,fpath,"");
+    fastpath(fpath);
 }

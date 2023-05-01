@@ -12,16 +12,6 @@ For use with [mackorone/mms](https://github.com/mackorone/mms), a Micromouse sim
 1. Enter the config for your algorithm (name, directory, build command, and run command)
 1. Click the "Run" button
 
-## Examples
-
-Windows:
-
-![](https://github.com/mackorone/mms-cpp/blob/master/config-windows.png)
-
-Linux (Ubuntu):
-
-![](https://github.com/mackorone/mms-cpp/blob/master/config-linux.png)
-
 
 ## Notes
 

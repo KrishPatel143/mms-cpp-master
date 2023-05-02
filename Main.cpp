@@ -37,7 +37,7 @@ using namespace std;
 
 pair<int, int> curr_poss;
 int dir = 0;
-int count = 0;
+int k = 0;
 bool stop = false;
 bool Isfounded = false;
 bool visit[60][60];
@@ -74,7 +74,7 @@ void print_arr()
         {
             cerr << maze[i][j] << ",";
         }
-        cerr << "},{";
+        cerr << "},\n{";
     }
 
     
@@ -129,115 +129,133 @@ int setdir(int i){
     return i;
 }
 
-void solveMaze(pair<int,int> poss,string& minans, string move )
-{
-	if (poss == s[stack_top])
-	{
-        minans = move;
-        Isfounded = true;
-        return;
-	}
-	string path = "0123";
-	for (int ind = 0; ind < 4; ind++)
-	{
-			// cout << nexti << " " << nextj << endl;
-		int nexti = poss.first + Horizontal[ind];
-		int nextj = poss.second + Vertical[ind];
-		if ( !visit[nexti][nextj] && maze[nexti][nextj] == 1 && !Isfounded)
-		{
-			visit[poss.first][poss.second] = 1;
-			solveMaze( {nexti,nextj} ,minans, move + path[ind]);
-			visit[poss.first][poss.second] = 0;
-		}
-	}
-}
+// void solveMaze(pair<int,int> poss,string& minans, string move )
+// {
+// 	if (poss == s[stack_top])
+// 	{
+//         minans = move;
+//         Isfounded = true;
+//         return;
+// 	}
+// 	string path = "0123";
+// 	for (int ind = 0; ind < 4; ind++)
+// 	{
+// 			// cout << nexti << " " << nextj << endl;
+// 		int nexti = poss.first + Horizontal[ind];
+// 		int nextj = poss.second + Vertical[ind];
+// 		if ( !visit[nexti][nextj] && maze[nexti][nextj] == 1 && !Isfounded)
+// 		{
+// 			visit[poss.first][poss.second] = 1;
+// 			solveMaze( {nexti,nextj} ,minans, move + path[ind]);
+// 			visit[poss.first][poss.second] = 0;
+// 		}
+// 	}
+// }
 
-void findpathinMaze(int a,int b,pair<int,int> poss,string& minans, string move )
-{
-	if (poss.first == a & poss.second == b )
-	{
-        if (minans == "" | move <= minans)
-        { 
-            minans = move;
-            Isfounded = true;
-            return;
-        }
+// void findpathinMaze(int a,int b,pair<int,int> poss,string& minans, string move )
+// {
+// 	if (poss.first == a & poss.second == b )
+// 	{
+//         if (minans == "" | move <= minans)
+//         { 
+//             minans = move;
+//             Isfounded = true;
+//             return;
+//         }
         
-	}
-	string path = "0123";
-	for (int ind = 0; ind < 4; ind++)
-	{
-			// cout << nexti << " " << nextj << endl;
-		int nexti = poss.first + Horizontal[ind];
-		int nextj = poss.second + Vertical[ind];
-		if ( !visit[nexti][nextj] && maze[nexti][nextj] == 1 && !Isfounded)
-		{
-			visit[poss.first][poss.second] = 1;
-			findpathinMaze(a,b, {nexti,nextj} ,minans, move + path[ind]);
-			visit[poss.first][poss.second] = 0;
-		}
-	}
-}
+// 	}
+// 	string path = "0123";
+// 	for (int ind = 0; ind < 4; ind++)
+// 	{
+// 			// cout << nexti << " " << nextj << endl;
+// 		int nexti = poss.first + Horizontal[ind];
+// 		int nextj = poss.second + Vertical[ind];
+// 		if ( !visit[nexti][nextj] && maze[nexti][nextj] == 1 && !Isfounded)
+// 		{
+// 			visit[poss.first][poss.second] = 1;
+// 			findpathinMaze(a,b, {nexti,nextj} ,minans, move + path[ind]);
+// 			visit[poss.first][poss.second] = 0;
+// 		}
+// 	}
+// }
 
-void followPath(string path){
-    for (int i = 0; i < path.size(); i += 2)
-    { 
-        int path_dir = (int)path[i] - 48;
-        if(setdir(dir - 1) == path_dir)
-        {
-            API::turnLeft();
-        }
-        else if(setdir(dir + 1) == path_dir)
-        {
-            API::turnRight();
-        }
-        else if(setdir(dir + 2) == path_dir)
-        {
-            API::turnRight();
-            API::turnRight();
-        }
-        dir = setdir(path_dir);
-        API::moveForward();
-        curr_poss = {curr_poss.first + Horizontal[dir] * 2,curr_poss.second + Vertical[dir] * 2};
+// void followPath(string path){
+//     for (int i = 0; i < path.size(); i += 2)
+//     { 
+//         int path_dir = (int)path[i] - 48;
+//         if(setdir(dir - 1) == path_dir)
+//         {
+//             API::turnLeft();
+//         }
+//         else if(setdir(dir + 1) == path_dir)
+//         {
+//             API::turnRight();
+//         }
+//         else if(setdir(dir + 2) == path_dir)
+//         {
+//             API::turnRight();
+//             API::turnRight();
+//         }
+//         dir = setdir(path_dir);
+//         API::moveForward();
+//         curr_poss = {curr_poss.first + Horizontal[dir] * 2,curr_poss.second + Vertical[dir] * 2};
 
+//     }
+// }
+
+string NtoS(int n){
+    string str = "";
+    for (int i = 0; n != 0 ; i++)
+    {
+        str += (char(n % 10 + 48) );
+        n /= 10;
     }
+        
+    cerr << str << endl;
+    reverse(str.begin(),str.end());
+    cerr << str << endl;
+    return str;
 }
 
-void fastpath(string path){
-    for (int i = 0; i < path.size(); i += 2)
-    { 
-        int path_dir = (int)path[i] - 48;
-        if(setdir(dir - 1) == path_dir)
-        {
-            API::turnLeft();
-        }
-        else if(setdir(dir + 1) == path_dir)
-        {
-            API::turnRight();
-        }
-        else if(setdir(dir + 2) == path_dir)
-        {
-            API::turnRight();
-            API::turnRight();
-        }
-        dir = setdir(path_dir);
-        API::moveForward();
-        curr_poss = {curr_poss.first + Horizontal[dir] * 2,curr_poss.second + Vertical[dir] * 2};
-        API::setColor(curr_poss.first/2 - 1, curr_poss.second/2 -1, 'r');
+// void fastpath(string path){
+//     // API::setColor(curr_poss.first/2 - 1, curr_poss.second/2 -1, 'r');
+//     // API::setText(curr_poss.first/2 - 1, curr_poss.second/2 -1, NtoS(k));
+//     for (int i = 0; i < path.size(); i += 2)
+//     { 
+//         int path_dir = (int)path[i] - 48;
+//         if(setdir(dir - 1) == path_dir)
+//         {
+//             API::turnLeft();
+//         }
+//         else if(setdir(dir + 1) == path_dir)
+//         {
+//             API::turnRight();
+//         }
+//         else if(setdir(dir + 2) == path_dir)
+//         {
+//             API::turnRight();
+//             API::turnRight();
+//         }
+//         dir = setdir(path_dir);
+//         API::moveForward();
+//         API::setColor(curr_poss.first/2 - 1, curr_poss.second/2 -1, 'r');
+//          API::setText(curr_poss.first/2 - 1, curr_poss.second/2 -1, NtoS(k));
+//         k++;
+//         curr_poss = {curr_poss.first + Horizontal[dir] * 2,curr_poss.second + Vertical[dir] * 2};
 
-    }
-}
+//     }
+// }
 
-string getpath(){
-    string path = "";
-    solveMaze(curr_poss,path,"");
-    return path;
-}
+// string getpath(){
+//     string path = "";
+//     solveMaze(curr_poss,path,"");
+//     return path;
+// }
 
 void backTrack(){
     vector<int> remove_ele;
     string finalpath = "";
-    Isfounded = false;
+    // Isfounded = false;
 
 
     for (stack_top = s.size() - 1; stack_top >= 0; stack_top--)
@@ -420,3 +438,7 @@ int main(int argc, char *argv[])
     fastpath(fpath);
     
 }
+
+
+
+    
